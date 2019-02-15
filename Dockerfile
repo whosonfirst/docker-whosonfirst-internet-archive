@@ -9,7 +9,8 @@ RUN pip install internetarchive
 
 RUN mkdir /usr/local/data
 RUN mkdir /usr/local/build
-RUN mkdir /root/.config
+RUN mkdir /etc/internetarchive
+
+VOLUME /etc/internetarchive
 
 COPY bin/wof-internet-archive /usr/bin/
-COPY config/ia.ini /root/.config/

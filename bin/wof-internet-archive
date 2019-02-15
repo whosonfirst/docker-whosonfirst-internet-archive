@@ -51,7 +51,7 @@ do
     
     tar --exclude='.git*' --exclude='Makefile*' -cvjf ${BUILD}/${REPO}-${YMD}.tar.bz2 ./data ./meta ./LICENSE.md ./CONTRIBUTING.md ./README.md
 
-    echo ia upload ${REPO}-${YMD} ${BUILD}/${REPO}-${YMD}.tar.bz2 --metadata="title:${REPO}-${YMD}" --metadata="licenseurl:${LICENSE}" --metadata="date:${YMD}" --metadata="subject:geo;whosonfirst" --metadata="creator:${CREATOR}"
+    ia --config /etc/internetarchive/ia.ini upload ${REPO}-${YMD} ${BUILD}/${REPO}-${YMD}.tar.bz2 --metadata="title:${REPO}-${YMD}" --metadata="licenseurl:${LICENSE}" --metadata="date:${YMD}" --metadata="subject:geo;whosonfirst" --metadata="creator:${CREATOR}"
 
     ls -al ${BUILD}
 
