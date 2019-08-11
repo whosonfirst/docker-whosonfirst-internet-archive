@@ -44,7 +44,7 @@ YMD=`date "+%Y%m%d"`
 
 cd ${DATA}
 
-for REPO in `${LIST_REPOS} -org ${ORG} -prefix ${ORG} -token ${GITHUB_TOKEN} -updated-since ${SINCE}`
+for REPO in `${LIST_REPOS} -org ${ORG} -prefix ${ORG} -token ${GITHUB_TOKEN} -updated-since ${UPDATED_SINCE}`
 do
 
     echo "ARCHIVE ${REPO}"
