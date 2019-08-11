@@ -5,9 +5,12 @@ CREATOR="Who's On First"
 ORG="whosonfirst-data"
 LICENSE="https://cdla.io/permissive-1-0/"
 
+UPDATED_SINCE="P30D"
+GITHUB_TOKEN=""
+
 USAGE=""
 
-ARGS=`getopt o:l:c:h $*`
+ARGS=`getopt s:t:h $*`
 set -- $ARGS
 
 for i; do
@@ -15,22 +18,19 @@ for i; do
         -h  ) 
 	    USAGE=1
 	    shift; shift;;
-        -c  ) 
-	    CREATOR=$2
+        -s  ) 
+	    UPDATED_SINCE=$2
 	    shift; shift;;	
-	-l  )
-	    LICENSE=$2
+	-t  )
+	    GITHUB_TOKEN=$2
 	    shift; shift ;;
-	-o  )
-	    ORG=$2
-	    shift; shift ;;	
 	--  ) shift; break ;;
     esac
 done
 
 if [ "${USAGE}" = "1" ]
 then
-    echo "usage: wof-internet-archive -options REPO REPO..."
+    echo "usage: wof-internet-archive -options"
     echo "options:"
     echo "...please write me"
     exit 0
@@ -42,19 +42,22 @@ YMD=`date "+%Y%m%d"`
 
 cd ${DATA}
 
-for REPO in $@
+for REPO in `${LIST_REPOS} -org ${ORG} -prefix ${ORG} -token ${GITHUB_TOKEN} -updated-since ${SINCE}`
 do
 
+    echo "ARCHIVE ${REPO}"
+    
     git clone --depth 1 https://github.com/${ORG}/${REPO}.git
 
     cd ${REPO}
     
     tar --exclude='.git*' --exclude='Makefile*' -cvjf ${BUILD}/${REPO}-${YMD}.tar.bz2 ./data ./meta ./LICENSE.md ./CONTRIBUTING.md ./README.md
 
-    ia --config /etc/internetarchive/ia.ini upload ${REPO}-${YMD} ${BUILD}/${REPO}-${YMD}.tar.bz2 --metadata="title:${REPO}-${YMD}" --metadata="licenseurl:${LICENSE}" --metadata="date:${YMD}" --metadata="subject:geo;whosonfirst" --metadata="creator:${CREATOR}"
+    echo ia --config /etc/internetarchive/ia.ini upload ${REPO}-${YMD} ${BUILD}/${REPO}-${YMD}.tar.bz2 --metadata="title:${REPO}-${YMD}" --metadata="licenseurl:${LICENSE}" --metadata="date:${YMD}" --metadata="subject:geo;whosonfirst" --metadata="creator:${CREATOR}"
 
     ls -al ${BUILD}
 
     cd -
+    rm -rf ${REPO}
     
 done
