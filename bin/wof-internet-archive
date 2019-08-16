@@ -6,7 +6,8 @@ ORG="whosonfirst-data"
 LICENSE="https://cdla.io/permissive-1-0/"
 
 UPDATED_SINCE="P30D"
-GITHUB_TOKEN=""
+GITHUB_TOKEN=""			# maybe deprecated, not sure
+IA_CONFIG="/etc/internetarchive/ia.ini"
 
 USAGE=""
 
@@ -24,6 +25,9 @@ for i; do
 	-t  )
 	    GITHUB_TOKEN=$2
 	    shift; shift ;;
+	-c  )
+	    IA_CONFIG=$2
+	    shift; shift ;;	
 	--  ) shift; break ;;
     esac
 done
@@ -44,7 +48,7 @@ YMD=`date "+%Y%m%d"`
 
 cd ${DATA}
 
-for REPO in `${LIST_REPOS} -org ${ORG} -prefix ${ORG} -token ${GITHUB_TOKEN} -updated-since ${UPDATED_SINCE}`
+for REPO in `${LIST_REPOS} -org ${ORG} -prefix ${ORG} -updated-since ${UPDATED_SINCE}`
 do
 
     echo "ARCHIVE ${REPO}"
@@ -55,7 +59,7 @@ do
     
     tar --exclude='.git*' --exclude='Makefile*' -cvjf ${BUILD}/${REPO}-${YMD}.tar.bz2 ./data ./meta ./LICENSE.md ./CONTRIBUTING.md ./README.md
 
-    echo ia --config /etc/internetarchive/ia.ini upload ${REPO}-${YMD} ${BUILD}/${REPO}-${YMD}.tar.bz2 --metadata="title:${REPO}-${YMD}" --metadata="licenseurl:${LICENSE}" --metadata="date:${YMD}" --metadata="subject:geo;whosonfirst" --metadata="creator:${CREATOR}"
+    echo ia --config ${IA_CONFIG} upload ${REPO}-${YMD} ${BUILD}/${REPO}-${YMD}.tar.bz2 --metadata="title:${REPO}-${YMD}" --metadata="licenseurl:${LICENSE}" --metadata="date:${YMD}" --metadata="subject:geo;whosonfirst" --metadata="creator:${CREATOR}"
 
     ls -al ${BUILD}
 

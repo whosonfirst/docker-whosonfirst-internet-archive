@@ -1,0 +1,44 @@
+#!/bin/sh
+# -*-sh-*-
+
+UPDATED_SINCE="P30D"
+IA_CONFIG="/etc/internetarchive/ia.ini"
+
+USAGE=""
+
+ARGS=`getopt s:t:h $*`
+set -- $ARGS
+
+for i; do
+    case "$i" in
+        -h  ) 
+	    USAGE=1
+	    shift; shift;;
+        -s  ) 
+	    UPDATED_SINCE=$2
+	    shift; shift;;	
+	-c  )
+	    IA_CONFIG=$2
+	    shift; shift ;;	
+	--  ) shift; break ;;
+    esac
+done
+
+if [ "${USAGE}" = "1" ]
+then
+    echo "usage: wof-internet-archive -options"
+    echo "options:"
+    echo "...please write me"
+    exit 0
+fi
+
+GET_SECRET=`which aws-get-secret`	# PLEASE WRITE ME!
+WOF_INTERNET_ARCHIVE=`which wof-internet-archive`
+
+IA_CONFIG_DATA=`${GET_SECRET} ia-config`
+
+# please for error handling me...
+
+echo ${IA_CONFIG_DATA} > ${IA_CONFIG}
+
+${WOF_INTERNET_ARCHIVE} -c ${IA_CONFIG} -s ${UPDATED_SINCE}
