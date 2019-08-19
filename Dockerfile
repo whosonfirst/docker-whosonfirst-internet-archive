@@ -19,7 +19,7 @@ FROM alpine
 RUN apk update && apk upgrade \
     && apk add py-pip git bzip2 ca-certificates
 
-RUN pip install internetarchive
+RUN pip install aws-cli internetarchive
 
 RUN mkdir /usr/local/data
 RUN mkdir /usr/local/build

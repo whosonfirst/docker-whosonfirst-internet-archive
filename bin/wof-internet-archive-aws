@@ -1,26 +1,37 @@
 #!/bin/sh
 # -*-sh-*-
 
+AWS_REGION="us-east-1"
+AWS_SECRET_ID="internetarchive-test"
+
 UPDATED_SINCE="P30D"
 IA_CONFIG="/etc/internetarchive/ia.ini"
 
+WOF_INTERNET_ARCHIVE=`which wof-internet-archive`
+
 USAGE=""
 
-ARGS=`getopt s:t:h $*`
-set -- $ARGS
+# https://sookocheff.com/post/bash/parsing-bash-script-arguments-with-shopts/
+# 'getopts' is your friend; 'getopt' is your weird friend
 
-for i; do
-    case "$i" in
-        -h  ) 
-	    USAGE=1
-	    shift; shift;;
-        -s  ) 
-	    UPDATED_SINCE=$2
-	    shift; shift;;	
+while getopts "c:i:r:s:h" opt
+do
+    case "${opt}" in
 	-c  )
 	    IA_CONFIG=$2
-	    shift; shift ;;	
-	--  ) shift; break ;;
+	    ;;
+        -h  ) 
+	    USAGE=1
+	    ;;
+	-i ) AWS_SECRET_ID=$2
+	     ;;
+	-r  ) AWS_REGION=$2
+	      ;;
+        -s  ) 
+	    UPDATED_SINCE=$2
+	    ;;
+	\? ) USAGE=1
+	     break;
     esac
 done
 
@@ -32,13 +43,16 @@ then
     exit 0
 fi
 
-GET_SECRET=`which aws-get-secret`	# PLEASE WRITE ME!
-WOF_INTERNET_ARCHIVE=`which wof-internet-archive`
+IA_SECRET=`aws --region ${AWS_REGION} secretsmanager get-secret-value --secret-id ${AWS_SECRET_ID}`
 
-IA_CONFIG_DATA=`${GET_SECRET} ia-config`
+if [ $? -ne 0 ]
+then
+    echo "Failed to retrieve IA secrets"
+    exit 1
+fi
 
-# please for error handling me...
+echo ${IA_SECRETS} > ${IA_CONFIG}
 
-echo ${IA_CONFIG_DATA} > ${IA_CONFIG}
+# ${WOF_INTERNET_ARCHIVE} -c ${IA_CONFIG} -s ${UPDATED_SINCE}
 
-${WOF_INTERNET_ARCHIVE} -c ${IA_CONFIG} -s ${UPDATED_SINCE}
+exit 0
